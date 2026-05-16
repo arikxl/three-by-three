@@ -52,7 +52,6 @@ export const updateProgress = mutation({
     isCorrect: v.boolean(),
   },
   handler: async (ctx, args) => {
-    // 1. מוצאים את המשתמש לפי ה-ID של Clerk
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier))
@@ -62,15 +61,27 @@ export const updateProgress = mutation({
       throw new Error("User not found");
     }
 
-    // 2. מכינים את השינויים: תמיד מקדמים את מונה השאלות שסוימו
+    // מקדמים את מונה השאלות שהשחקן סיים
+    const newCompletedCount = (user.completedQuestions || 0) + 1;
     const patches: any = {
-      completedQuestions: (user.completedQuestions || 0) + 1,
+      completedQuestions: newCompletedCount,
     };
 
-    // 3. אם התשובה נכונה, מוסיפים נקודה לטוטאל ולקטגוריה הספציפית
-    if (args.isCorrect) {
-      patches.totalScore = (user.totalScore || 0) + 1;
+    // חישוב הנקודות להוספה
+    let scoreAddition = args.isCorrect ? 1 : 0; // נקודה על תשובה נכונה
 
+    // בונוס מיוחד: אם זו בדיוק השאלה ה-333, נוסיף 33 נקודות בונוס!
+    if (newCompletedCount === 333) {
+      scoreAddition += 33;
+    }
+
+    // מעדכנים את הציון הכללי אם התווספו נקודות (תשובה נכונה או בונוס סיום)
+    if (scoreAddition > 0) {
+      patches.totalScore = (user.totalScore || 0) + scoreAddition;
+    }
+
+    // מעדכנים את קטגוריית המשנה (רק אם התשובה הייתה נכונה)
+    if (args.isCorrect) {
       if (args.category === "פרסית") {
         patches.farsiScore = (user.farsiScore || 0) + 1;
       } else if (args.category === "תרבות איראן") {
@@ -80,7 +91,6 @@ export const updateProgress = mutation({
       }
     }
 
-    // 4. שמירת השינויים במסד הנתונים
     await ctx.db.patch(user._id, patches);
     return { success: true };
   },
@@ -103,6 +113,7 @@ export const getLeaderboardData = query({
     const cities = ['אילת', 'באר שבע', 'טירת הכרמל'];
     
     // חישוב ממוצעים לכל קבוצה
+// חישוב ממוצעים לכל קבוצה (מעוגל למספר שלם לחלוטין)
     const teamStats = cities.map(city => {
       const teamUsers = users.filter(u => u.city === city);
       const count = teamUsers.length > 0 ? teamUsers.length : 1; // מניעת חלוקה באפס
@@ -110,10 +121,10 @@ export const getLeaderboardData = query({
       return {
         city,
         participants: teamUsers.length,
-        avgTotal: Math.round((teamUsers.reduce((sum, u) => sum + (u.totalScore || 0), 0) / count) * 10) / 10,
-        avgFarsi: Math.round((teamUsers.reduce((sum, u) => sum + (u.farsiScore || 0), 0) / count) * 10) / 10,
-        avgIntel: Math.round((teamUsers.reduce((sum, u) => sum + (u.intelScore || 0), 0) / count) * 10) / 10,
-        avgCulture: Math.round((teamUsers.reduce((sum, u) => sum + (u.cultureScore || 0), 0) / count) * 10) / 10,
+        avgTotal: Math.round(teamUsers.reduce((sum, u) => sum + (u.totalScore || 0), 0) / count),
+        avgFarsi: Math.round(teamUsers.reduce((sum, u) => sum + (u.farsiScore || 0), 0) / count),
+        avgIntel: Math.round(teamUsers.reduce((sum, u) => sum + (u.intelScore || 0), 0) / count),
+        avgCulture: Math.round(teamUsers.reduce((sum, u) => sum + (u.cultureScore || 0), 0) / count),
       };
     });
 

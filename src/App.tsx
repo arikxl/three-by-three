@@ -64,14 +64,15 @@ function App() {
           {/* הברכה האישית למשתמש מחובר */}
           <SignedIn>
             <h1 className="text-2xl font-black text-gray-800 animate-in fade-in slide-in-from-top-4">
-              שלום, {user?.firstName || 'שחקן'}! 👋
+              היי, {user?.firstName || 'שחקן'}! 
             </h1>
           </SignedIn>
 
-          <div className="w-48 h-48 bg-gray-200 rounded-3xl flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 shadow-sm transition-colors duration-300">
-            <ImageIcon size={48} className="mb-2 opacity-50" />
-            <span className="text-sm font-medium">כאן יבוא הלוגו</span>
-          </div>
+          <img
+            src="https://res.cloudinary.com/arikxl/image/upload/v1778973968/Ella2023/mdokexsgo0tawspzpybf.png"
+            alt="Arik Alexandrov"
+            className="w-56 h-56 object-cover rounded-3xl transition-all duration-300"
+          />
 
           {/* הקטנתי טיפה את הרווח (gap-3) כדי ש-3 הכפתורים ייכנסו יפה במובייל */}
           <div className="w-full flex flex-col gap-3">
