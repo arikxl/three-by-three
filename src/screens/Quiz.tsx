@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { UserButton, useUser } from '@clerk/clerk-react'
 import { Timer, Pause, Loader2, Trophy } from 'lucide-react'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 interface QuizProps {
@@ -13,30 +13,31 @@ interface QuizProps {
 export default function Quiz({ theme, city, onPause }: QuizProps) {
     const { user } = useUser()
 
-    // 1. שליפת השאלות מקונבקס
+    // שליפת השאלות ונתוני המשתמש העדכניים מקונבקס
     const rawQuestions = useQuery(api.questions.getAll)
+    const dbUser = useQuery(api.users.getUser, user ? { tokenIdentifier: user.id } : "skip")
 
-    // 2. ניהול ה-State של המשחק
+    // מוטציה לעדכון התקדמות בבסיס הנתונים
+    const updateProgress = useMutation(api.users.updateProgress)
+
+    // ניהול ה-State של המשחק
     const [questions, setQuestions] = useState<any[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
-    const [score, setScore] = useState(0)
     const [timeLeft, setTimeLeft] = useState(10)
 
-    // ניהול בדיקת התשובה (כדי להציג צבעים ולהשהות טיימר)
+    // ניהול בדיקת התשובה
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
     const [isChecking, setIsChecking] = useState(false)
-
-    // ציון האם המשתמש ביקש הפסקה
     const [pauseRequested, setPauseRequested] = useState(false)
 
-    // 3. ערבוב השאלות ברגע שהן מגיעות מהשרת
+    // ערבוב השאלות ברגע שהן מגיעות מהשרת
     useEffect(() => {
         if (rawQuestions && questions.length === 0) {
             setQuestions([...rawQuestions].sort(() => Math.random() - 0.5))
         }
     }, [rawQuestions])
 
-    // 4. לוגיקת הטיימר
+    // לוגיקת הטיימר
     useEffect(() => {
         if (isChecking || timeLeft === 0 || questions.length === 0 || currentIndex >= questions.length) return;
 
@@ -56,39 +57,31 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
 
     const currentQuestion = questions[currentIndex]
 
-    // 5. פונקציית מעבר שאלה (או חזרה לדף הבית אם התבקשה הפסקה)
     const goToNextQuestion = () => {
-        // בדיקה האם המשתמש ביקש הפסקה במהלך השאלה
         if (pauseRequested && onPause) {
             onPause()
-            return // עוצרים כאן ולא ממשיכים לשאלה הבאה
+            return
         }
-
         setSelectedAnswer(null)
         setIsChecking(false)
         setTimeLeft(10)
         setCurrentIndex((prev) => prev + 1)
     }
 
-    // 6. מה קורה כשהזמן נגמר
-    const handleTimeUp = () => {
-        setIsChecking(true)
-        setTimeout(() => {
-            goToNextQuestion()
-        }, 2000)
-    }
-
-    // 7. לחיצה על תשובה
-    const handleAnswerClick = (answer: string) => {
-        if (isChecking) return
-
-        setSelectedAnswer(answer)
+    // מה קורה כשהזמן נגמר
+    const handleTimeUp = async () => {
+        if (!user || !currentQuestion) return
         setIsChecking(true)
 
-        const isCorrect = answer === currentQuestion.correctAnswer
-
-        if (isCorrect) {
-            setScore((prev) => prev + 1) // כל תשובה נכונה מעניקה בדיוק נקודה אחת
+        try {
+            // מעדכנים בשרת שהמשתמש סיים שאלה אבל לא צדק (isCorrect: false)
+            await updateProgress({
+                tokenIdentifier: user.id,
+                category: currentQuestion.category,
+                isCorrect: false
+            })
+        } catch (err) {
+            console.error("שגיאה בעדכון זמן שנגמר:", err)
         }
 
         setTimeout(() => {
@@ -96,14 +89,37 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
         }, 2000)
     }
 
-    // ================= תצוגות מיוחדות =================
+    // לחיצה על תשובה
+    const handleAnswerClick = async (answer: string) => {
+        if (isChecking || !user || !currentQuestion) return
 
-    // טעינה
-    if (questions.length === 0) {
+        setSelectedAnswer(answer)
+        setIsChecking(true)
+
+        const isCorrect = answer === currentQuestion.correctAnswer
+
+        try {
+            // שליחת העדכון ישירות לקונבקס בזמן אמת!
+            await updateProgress({
+                tokenIdentifier: user.id,
+                category: currentQuestion.category,
+                isCorrect: isCorrect
+            })
+        } catch (err) {
+            console.error("שגיאה בעדכון התשובה בקונבקס:", err)
+        }
+
+        setTimeout(() => {
+            goToNextQuestion()
+        }, 2000)
+    }
+
+    // תצוגת טעינה (ממתינים גם לשאלות וגם לנתוני השחקן)
+    if (questions.length === 0 || !dbUser) {
         return (
             <div className="w-full max-w-md flex flex-col items-center justify-center py-20 gap-4">
                 <Loader2 className={`animate-spin ${theme.text}`} size={48} />
-                <p className="text-gray-500 font-bold">טוען את 333 השאלות...</p>
+                <p className="text-gray-500 font-bold">טוען את נתוני המשחק...</p>
             </div>
         )
     }
@@ -119,7 +135,7 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
                 </div>
                 <div className={`p-4 rounded-2xl ${theme.lightBg} border ${theme.border}`}>
                     <p className="text-sm font-bold text-gray-500 mb-1">הניקוד הסופי שלך:</p>
-                    <p className={`text-4xl font-black ${theme.text}`}>{score} נק'</p>
+                    <p className={`text-4xl font-black ${theme.text}`}>{dbUser.totalScore || 0} נק'</p>
                 </div>
                 <button
                     onClick={onPause}
@@ -131,18 +147,16 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
         )
     }
 
-    // ================= המסך המרכזי =================
-
     const timerColor = timeLeft <= 3 ? 'text-red-500' : theme.text;
 
     return (
         <div className="w-full max-w-md animate-in slide-in-from-bottom-8 duration-500 flex flex-col gap-4">
 
-            {/* Header */}
+            {/* Header - מציג את הציון העדכני מתוך ה-DB */}
             <header className={`flex items-center justify-between p-4 bg-white rounded-3xl shadow-sm border-2 ${theme.border}`}>
                 <div className="text-right">
                     <p className="font-bold text-gray-500 text-xs mb-0.5">{user?.firstName || 'שחקן'}</p>
-                    <p className="font-black text-gray-800 text-xl leading-tight">{score} נק'</p>
+                    <p className="font-black text-gray-800 text-xl leading-tight">{dbUser.totalScore || 0} נק'</p>
                     <p className={`text-sm font-bold ${theme.text}`}>קבוצת {city}</p>
                 </div>
                 <div>
@@ -211,7 +225,7 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
 
             </main>
 
-            {/* כפתור הפסקה מעודכן */}
+            {/* כפתור הפסקה */}
             <button
                 onClick={() => setPauseRequested(true)}
                 disabled={pauseRequested || isChecking}

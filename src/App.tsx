@@ -1,8 +1,8 @@
 import './App.css'
 
-
+import Leaderboard from './screens/Leaderboard'
 import { useState } from 'react'
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { Image as ImageIcon, Trophy, ChevronRight, Check } from 'lucide-react'
@@ -56,11 +56,6 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center font-sans animate-fade-in" dir="rtl">
 
-      <header className="absolute top-6 left-6 z-10">
-        <SignedIn>
-          <UserButton afterSignOutUrl="/" />
-        </SignedIn>
-      </header>
 
       {/* ================= 1. מסך הבית ================= */}
       {currentScreen === 'home' && (
@@ -214,22 +209,9 @@ function App() {
       )}
 
       {/* ================= 5. מסך טבלת אלופים (שלד זמני) ================= */}
+      {/* ================= 5. מסך טבלת אלופים ================= */}
       {currentScreen === 'leaderboard' && (
-        <main className="w-full max-w-xs flex flex-col bg-white p-6 rounded-3xl shadow-sm border border-gray-100 min-h-[60vh]">
-          <div className="flex items-center mb-6">
-            <button onClick={() => setCurrentScreen('home')} className="text-gray-400 p-2 -mr-2 transition-colors">
-              <ChevronRight size={24} />
-            </button>
-            <h2 className="text-xl font-black text-gray-800 flex-1 pr-2 text-right">טבלת האלופים</h2>
-          </div>
-
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-4">
-            <Trophy size={48} className="text-amber-400 opacity-50" />
-            <p className="font-medium text-center">
-              הטבלה מתעדכנת... <br /> בקרוב נראה מי אלופי בו"ם!
-            </p>
-          </div>
-        </main>
+        <Leaderboard theme={currentTheme} onBack={() => setCurrentScreen('home')} />
       )}
 
     </div>

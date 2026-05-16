@@ -43,3 +43,89 @@ export const saveUser = mutation({
     });
   },
 });
+
+
+export const updateProgress = mutation({
+  args: {
+    tokenIdentifier: v.string(),
+    category: v.string(),
+    isCorrect: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    // 1. מוצאים את המשתמש לפי ה-ID של Clerk
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // 2. מכינים את השינויים: תמיד מקדמים את מונה השאלות שסוימו
+    const patches: any = {
+      completedQuestions: (user.completedQuestions || 0) + 1,
+    };
+
+    // 3. אם התשובה נכונה, מוסיפים נקודה לטוטאל ולקטגוריה הספציפית
+    if (args.isCorrect) {
+      patches.totalScore = (user.totalScore || 0) + 1;
+
+      if (args.category === "פרסית") {
+        patches.farsiScore = (user.farsiScore || 0) + 1;
+      } else if (args.category === "תרבות איראן") {
+        patches.cultureScore = (user.cultureScore || 0) + 1;
+      } else if (args.category === "מודיעין") {
+        patches.intelScore = (user.intelScore || 0) + 1;
+      }
+    }
+
+    // 4. שמירת השינויים במסד הנתונים
+    await ctx.db.patch(user._id, patches);
+    return { success: true };
+  },
+});
+
+
+// הוסף את זה לסוף הקובץ convex/users.ts
+export const getLeaderboardData = query({
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+
+    // פונקציית עזר לשליפת המובילים לפי שדה מסוים
+    const getTopPlayers = (field: keyof typeof users[0], limit: number) => {
+      return [...users]
+        .sort((a, b) => ((b[field] as number) || 0) - ((a[field] as number) || 0))
+        .slice(0, limit)
+        .map(u => ({ name: u.name, city: u.city, score: u[field] }));
+    };
+
+    const cities = ['אילת', 'באר שבע', 'טירת הכרמל'];
+    
+    // חישוב ממוצעים לכל קבוצה
+    const teamStats = cities.map(city => {
+      const teamUsers = users.filter(u => u.city === city);
+      const count = teamUsers.length > 0 ? teamUsers.length : 1; // מניעת חלוקה באפס
+      
+      return {
+        city,
+        participants: teamUsers.length,
+        avgTotal: Math.round((teamUsers.reduce((sum, u) => sum + (u.totalScore || 0), 0) / count) * 10) / 10,
+        avgFarsi: Math.round((teamUsers.reduce((sum, u) => sum + (u.farsiScore || 0), 0) / count) * 10) / 10,
+        avgIntel: Math.round((teamUsers.reduce((sum, u) => sum + (u.intelScore || 0), 0) / count) * 10) / 10,
+        avgCulture: Math.round((teamUsers.reduce((sum, u) => sum + (u.cultureScore || 0), 0) / count) * 10) / 10,
+      };
+    });
+
+    return {
+      top10Overall: getTopPlayers("totalScore", 10),
+      top5Farsi: getTopPlayers("farsiScore", 5),
+      top5Intel: getTopPlayers("intelScore", 5),
+      top5Culture: getTopPlayers("cultureScore", 5),
+      teamsOverall: [...teamStats].sort((a, b) => b.avgTotal - a.avgTotal),
+      teamsFarsi: [...teamStats].sort((a, b) => b.avgFarsi - a.avgFarsi),
+      teamsIntel: [...teamStats].sort((a, b) => b.avgIntel - a.avgIntel),
+      teamsCulture: [...teamStats].sort((a, b) => b.avgCulture - a.avgCulture),
+    };
+  },
+});
