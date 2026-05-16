@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
-import {  Trophy, ChevronRight, Check } from 'lucide-react'
+import { Trophy, ChevronRight, Check } from 'lucide-react'
 import Quiz from './screens/Quiz'
 
 type City = 'אילת' | 'באר שבע' | 'טירת הכרמל'
@@ -65,9 +65,9 @@ function App() {
           <SignedIn>
             <div className="flex gap-8 items-center justify-center">
               <UserButton afterSignOutUrl="/" />
-            <h1 className="text-2xl font-black text-gray-800 animate-in fade-in slide-in-from-top-4">
-              היי, {user?.firstName || 'שחקן'}! 
-            </h1>
+              <h1 className="text-2xl font-black text-gray-800 animate-in fade-in slide-in-from-top-4">
+                היי, {user?.firstName || 'שחקן'}!
+              </h1>
             </div>
           </SignedIn>
 
@@ -112,40 +112,33 @@ function App() {
               הוראות
             </button>
           </div>
+          <p className="">Created by <a target="_blank" href="https://www.linkedin.com/in/arik-alexandrov/">arikxl</a></p>
+
         </main>
       )}
 
       {/* ================= 2. מסך הוראות ================= */}
       {currentScreen === 'instructions' && (
-        <main className="w-full max-w-xs flex flex-col bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div className="flex items-center mb-6">
-            <button onClick={() => setCurrentScreen('home')} className="text-gray-400 p-2 -mr-2 transition-colors">
-              <ChevronRight size={24} />
-            </button>
-            <h2 className="text-xl font-black text-gray-800 flex-1 pr-2 text-right">הוראות המשחק</h2>
+        <main className="w-full max-w-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4">
+
+          <div className="text-center mt-2 mb-4">
+            <h2 className={`text-4xl font-black ${currentTheme.text}`}>שלום לתותחי בו"ם!</h2>
           </div>
 
-          <div className="text-right space-y-4 text-sm text-gray-600 mb-8">
-            <p className={`font-bold ${currentTheme.text} ${currentTheme.lightBg} p-3 rounded-xl border ${currentTheme.border} text-center transition-colors duration-300`}>
-              ברוכים הבאים תלמידי כיתה י' בתוכנית בו"ם!
-            </p>
+          <div className="text-right space-y-6 text-lg text-gray-700 px-2 leading-relaxed font-medium">
             <p>• החידון מורכב משאלות בנושאי <strong>פרסית, תרבות איראן ומודיעין</strong>.</p>
+
             <p>• בסך הכל יש <strong>333 שאלות</strong> וכל שאלה תופיע פעם אחת בלבד.</p>
-            <p>• שחקן שיסיים את כל השאלות יקבל <strong>בונוס מיוחד</strong> במערכת!</p>
+
+            <p>• המשחק רץ ברצף עד לסוף 333 השאלות. רוצים לעצור? יש <strong>כפתור הפסקה</strong> בתחתית השאלון שישמור את ההתקדמות שלכם ותוכלו לחזור בדיוק מאותה נקודה.</p>
+
+            <p>• מי שיסיים את כל השאלות יקבל <>בונוס נוסף</></p>
           </div>
 
-          <div className="w-full flex flex-col gap-3">
-            <button
-              onClick={() => setCurrentScreen('leaderboard')}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition-transform"
-            >
-              <Trophy size={18} />
-              טבלת האלופים
-            </button>
-
+          <div className="w-full flex flex-col gap-4 mt-6">
             <SignedOut>
               <SignInButton mode="modal">
-                <button className={`w-full ${currentTheme.bg} text-white font-bold py-3.5 rounded-2xl shadow-md transition-colors duration-300`}>
+                <button className={`w-full ${currentTheme.bg} text-white font-bold text-xl py-4 rounded-2xl shadow-md transition-colors duration-300`}>
                   התחלת המשחק
                 </button>
               </SignInButton>
@@ -154,11 +147,28 @@ function App() {
             <SignedIn>
               <button
                 onClick={handleStartGameClick}
-                className={`w-full ${currentTheme.bg} text-white font-bold py-3.5 rounded-2xl shadow-md ${currentTheme.hover} transition-all duration-300`}
+                className={`w-full ${currentTheme.bg} text-white font-bold text-xl py-4 rounded-2xl shadow-md ${currentTheme.hover} active:scale-95 transition-all duration-300`}
               >
                 התחלת המשחק
               </button>
             </SignedIn>
+
+            <button
+              onClick={() => setCurrentScreen('leaderboard')}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-xl py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-md"
+            >
+              <Trophy size={22} />
+              טבלת האלופים
+            </button>
+
+            {/* כפתור חזרה למסך הבית בתחתית הדף */}
+            <button
+              onClick={() => setCurrentScreen('home')}
+              className="flex items-center justify-center gap-1 text-gray-400 font-bold mt-4 hover:text-gray-600 transition-colors"
+            >
+              <ChevronRight size={20} />
+              חזרה למסך הבית
+            </button>
           </div>
         </main>
       )}
@@ -181,8 +191,8 @@ function App() {
                   key={city}
                   onClick={() => setSelectedCity(city)}
                   className={`w-full flex items-center justify-between p-4 rounded-xl border-2 font-bold transition-all duration-300 text-right ${isSelected
-                      ? `${cityTheme.border} ${cityTheme.lightBg} ${cityTheme.text}`
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    ? `${cityTheme.border} ${cityTheme.lightBg} ${cityTheme.text}`
+                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                 >
                   <span>{city}</span>
