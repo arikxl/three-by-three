@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
-import { Image as ImageIcon, Trophy, ChevronRight, Check } from 'lucide-react'
+import {  Trophy, ChevronRight, Check } from 'lucide-react'
 import Quiz from './screens/Quiz'
 
 type City = 'אילת' | 'באר שבע' | 'טירת הכרמל'
