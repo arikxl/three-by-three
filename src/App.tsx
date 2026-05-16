@@ -2,7 +2,7 @@ import './App.css'
 
 import Leaderboard from './screens/Leaderboard'
 import { useState } from 'react'
-import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/clerk-react'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import {  Trophy, ChevronRight, Check } from 'lucide-react'
@@ -63,9 +63,12 @@ function App() {
 
           {/* הברכה האישית למשתמש מחובר */}
           <SignedIn>
+            <div className="flex gap-8 items-center justify-center">
+              <UserButton afterSignOutUrl="/" />
             <h1 className="text-2xl font-black text-gray-800 animate-in fade-in slide-in-from-top-4">
               היי, {user?.firstName || 'שחקן'}! 
             </h1>
+            </div>
           </SignedIn>
 
           <img
