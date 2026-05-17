@@ -1,6 +1,6 @@
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import { ChevronRight, Trophy, Medal, Star, Info } from 'lucide-react'
+import { ChevronRight, Trophy, Medal, Star } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 
 interface LeaderboardProps {
