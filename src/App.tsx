@@ -102,7 +102,7 @@ function App() {
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-xl py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-md"
             >
               <Trophy size={22} />
-              טבלת האלופים
+             תותחי בו"ם
             </button>
 
             <button
@@ -158,7 +158,7 @@ function App() {
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-xl py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-md"
             >
               <Trophy size={22} />
-              טבלת האלופים
+             תותחי בו"ם
             </button>
 
             {/* כפתור חזרה למסך הבית בתחתית הדף */}

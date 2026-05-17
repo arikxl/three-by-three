@@ -62,32 +62,26 @@ export default function Leaderboard({ theme, onBack }: LeaderboardProps) {
     }
 
     return (
-        <div className="w-full max-w-md flex flex-col bg-white rounded-3xl shadow-sm border border-gray-100 h-[85vh] overflow-hidden animate-in fade-in duration-500">
+        <div className="w-full max-w-md flex flex-col bg-white rounded-3xl shadow-sm   overflow-hidden animate-in fade-in duration-500">
 
             {/* Header קבוע למעלה */}
             <div className={`flex items-center p-4 border-b-2 ${theme.border} bg-white z-10 sticky top-0`}>
                 <button onClick={onBack} className="text-gray-400 p-2 -mr-2 hover:bg-gray-100 rounded-full transition-colors">
                     <ChevronRight size={24} />
                 </button>
-                <h2 className={`text-xl font-black ${theme.text} flex-1 pr-2 text-right`}>טבלת האלופים</h2>
+                <h2 className={`text-xl font-black ${theme.text} flex-1 pr-2 text-right`}>תותחי בו"ם</h2>
             </div>
 
             {/* אזור גלילה (לכל הטבלאות) */}
             <div className="flex-1 overflow-y-auto p-4 space-y-8 pb-10">
 
-                {/* הודעה חשובה על חישוב ממוצעים */}
-                <div className={`flex items-start gap-3 p-4 rounded-2xl ${theme.lightBg} border ${theme.border}`}>
-                    <Info className={`${theme.text} shrink-0 mt-0.5`} size={20} />
-                    <p className="text-sm font-medium text-gray-700 text-right">
-                        <strong>חשוב לדעת:</strong> דירוג הקבוצות מחושב לפי <strong>ממוצע הנקודות</strong> למשתתף (סך הנקודות לחלק למספר השחקנים בקבוצה), כדי לשמור על הוגנות!
-                    </p>
-                </div>
+
 
                 {/* 1. טופ 10 שחקנים כללי */}
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                     <h3 className={`bg-gray-50 p-3 font-black text-gray-800 text-center border-b border-gray-200 flex items-center justify-center gap-2`}>
                         <Trophy size={18} className="text-amber-500" />
-                        טופ 10 - דירוג אישי כללי
+                        טופ 10 - דירוג אישי
                     </h3>
                     <div className="p-1">
                         {data.top10Overall.map((p: any, i: number) => renderPlayerRow(p, i))}
@@ -108,40 +102,40 @@ export default function Leaderboard({ theme, onBack }: LeaderboardProps) {
                 <hr className="border-t-2 border-dashed border-gray-200 my-6" />
 
                 {/* 3. אלופי הקטגוריות - שחקנים */}
-                <h3 className="text-lg font-black text-center text-gray-800 mb-2">🏆 אלופי הקטגוריות (אישי)</h3>
+                <h3 className="text-lg font-black text-center text-gray-800 mb-2">🏆 תותחים לפי נושאים</h3>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-emerald-50 text-emerald-800 p-2 font-bold text-center border-b border-emerald-100 text-sm">5 אלופי הפרסית</h4>
+                    <h4 className="bg-emerald-50 text-emerald-800 p-2 font-bold text-center border-b border-emerald-100 text-sm">אלופי הפרסית</h4>
                     <div className="p-1">{data.top5Farsi.map((p: any, i: number) => renderPlayerRow(p, i))}</div>
                 </section>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-blue-50 text-blue-800 p-2 font-bold text-center border-b border-blue-100 text-sm">5 אלופי המודיעין</h4>
+                    <h4 className="bg-blue-50 text-blue-800 p-2 font-bold text-center border-b border-blue-100 text-sm">אלופי המודיעין</h4>
                     <div className="p-1">{data.top5Intel.map((p: any, i: number) => renderPlayerRow(p, i))}</div>
                 </section>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-purple-50 text-purple-800 p-2 font-bold text-center border-b border-purple-100 text-sm">5 אלופי תרבות איראן</h4>
+                    <h4 className="bg-purple-50 text-purple-800 p-2 font-bold text-center border-b border-purple-100 text-sm">אלופי תרבות איראן</h4>
                     <div className="p-1">{data.top5Culture.map((p: any, i: number) => renderPlayerRow(p, i))}</div>
                 </section>
 
                 <hr className="border-t-2 border-dashed border-gray-200 my-6" />
 
                 {/* 4. אלופי הקטגוריות - קבוצות */}
-                <h3 className="text-lg font-black text-center text-gray-800 mb-2">⭐ דירוג קבוצות לפי קטגוריה (ממוצע)</h3>
+                <h3 className="text-lg font-black text-center text-gray-800 mb-2">⭐ דירוג קבוצות לפי נושאים</h3>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-emerald-50 text-emerald-800 p-2 font-bold text-center border-b border-emerald-100 text-sm">הקבוצות המובילות בפרסית</h4>
+                    <h4 className="bg-emerald-50 text-emerald-800 p-2 font-bold text-center border-b border-emerald-100 text-sm">תותחי פרסית</h4>
                     <div className="p-1">{data.teamsFarsi.map((t: any, i: number) => renderTeamRow(t, i, 'avgFarsi'))}</div>
                 </section>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-blue-50 text-blue-800 p-2 font-bold text-center border-b border-blue-100 text-sm">הקבוצות המובילות במודיעין</h4>
+                    <h4 className="bg-blue-50 text-blue-800 p-2 font-bold text-center border-b border-blue-100 text-sm">תותחי מודיעין</h4>
                     <div className="p-1">{data.teamsIntel.map((t: any, i: number) => renderTeamRow(t, i, 'avgIntel'))}</div>
                 </section>
 
                 <section className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <h4 className="bg-purple-50 text-purple-800 p-2 font-bold text-center border-b border-purple-100 text-sm">הקבוצות המובילות בתרבות איראן</h4>
+                    <h4 className="bg-purple-50 text-purple-800 p-2 font-bold text-center border-b border-purple-100 text-sm">תותחי תרבות אירן</h4>
                     <div className="p-1">{data.teamsCulture.map((t: any, i: number) => renderTeamRow(t, i, 'avgCulture'))}</div>
                 </section>
 
