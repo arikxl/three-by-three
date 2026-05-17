@@ -65,7 +65,7 @@ function App() {
           <SignedIn>
             <div className="flex gap-8 items-center justify-center">
               <UserButton afterSignOutUrl="/" />
-              <h1 className="text-2xl font-black text-gray-800 animate-in fade-in slide-in-from-top-4">
+              <h1 className="text-2xl text-gray-800 animate-in fade-in slide-in-from-top-4">
                 היי, {user?.firstName || 'שחקן'}!
               </h1>
             </div>
@@ -122,7 +122,7 @@ function App() {
         <main className="w-full max-w-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4">
 
           <div className="text-center mt-2 mb-4">
-            <h2 className={`text-4xl font-black ${currentTheme.text}`}>שלום לתותחי בו"ם!</h2>
+            <h2 className={`text-4xl ${currentTheme.text}`}>שלום לתותחי בו"ם!</h2>
           </div>
 
           <div className="text-right space-y-6 text-lg text-gray-700 px-2 leading-relaxed font-medium">
@@ -175,10 +175,10 @@ function App() {
 
       {/* ================= 3. מסך בחירת קבוצה ================= */}
       {currentScreen === 'team-select' && (
-        <main className="w-full max-w-xs flex flex-col bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+        <main className="w-full max-w-xs flex flex-col p-4 rounded-3xl ">
           <div className="text-right mb-6">
-            <h2 className="text-xl font-black text-gray-800">בחירת קבוצה</h2>
-            <p className="text-xs text-gray-400 mt-1">בחר לאיזו קבוצה אתה שייך כדי להמשיך</p>
+            <h2 className="text-xl text-gray-800">בחירת קבוצה</h2>
+            <p className="text-xs text-gray-400 mt-1">את מי אתם מייצגים?</p>
           </div>
 
           <div className="flex flex-col gap-3 mb-8">

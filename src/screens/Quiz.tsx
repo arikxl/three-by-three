@@ -134,9 +134,9 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
             <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center animate-in zoom-in duration-500 flex flex-col gap-6">
                 <Trophy size={64} className="text-amber-400 mx-auto" />
                 <div>
-                    <h2 className="text-2xl font-black text-gray-800 mb-2">כל הכבוד!</h2>
+                    <h2 className="text-2xl text-gray-800 mb-2">כל הכבוד!</h2>
                     <p className="text-gray-600">
-                        סיימת את כל {TOTAL_QUESTIONS} השאלות של בו"ם <br />
+                        סיימת את כל {TOTAL_QUESTIONS} השאלות <br />
                         והרווחת <strong>בונוס של 33 נקודות</strong> לקבוצה שלך!
                     </p>
                 </div>
@@ -148,7 +148,7 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
                     onClick={onPause}
                     className={`w-full text-white font-bold py-4 rounded-2xl shadow-md transition-all active:scale-95 ${theme.bg} ${theme.hover}`}
                 >
-                    חזור למסך הבית
+                    חזרה למסך הבית
                 </button>
             </div>
         )
@@ -165,9 +165,9 @@ export default function Quiz({ theme, city, onPause }: QuizProps) {
                 <div className="text-right">
                     <p className="font-bold text-gray-500 text-xs mb-0.5">{user?.firstName || 'שחקן'}</p>
                     <p className="font-black text-gray-800 text-xl leading-tight">{dbUser.totalScore || 0} נק'</p>
-                    <p className={`text-sm font-bold ${theme.text}`}>קבוצת {city}</p>
+                    <p className={`text-sm font-bold ${theme.text}`}>{city}</p>
                 </div>
-                <div>
+                <div className="">
                     <UserButton afterSignOutUrl="/" />
                 </div>
             </header>
